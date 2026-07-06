@@ -36,8 +36,9 @@ export default function Page() {
         `/api/receive-qr?${q.toString()}`,
       );
       const dataUrl = await QRCode.toDataURL(res.data || "", {
-        width: 200,
-        margin: 1,
+        width: 320,
+        margin: 3,
+        errorCorrectionLevel: "L",
         color: {
           dark: "#02AA9E",
           light: "#FFFFFF",

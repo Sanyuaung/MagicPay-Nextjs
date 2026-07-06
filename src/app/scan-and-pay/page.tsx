@@ -19,6 +19,9 @@ type QrScannerOptions = {
   returnDetailedScanResult?: boolean;
   preferredCamera?: "environment" | "user";
   onDecodeError?: (error: unknown) => void;
+  maxScansPerSecond?: number;
+  highlightScanRegion?: boolean;
+  highlightCodeOutline?: boolean;
 };
 
 type QrScannerCtor = new (
@@ -77,6 +80,9 @@ export default function Page() {
       {
         returnDetailedScanResult: true,
         preferredCamera: "environment",
+        maxScansPerSecond: 30,
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
         onDecodeError: () => {
           // Ignore frame-by-frame decode misses while camera is active.
         },
