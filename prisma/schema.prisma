@@ -281,6 +281,7 @@ model PulseAggregate {
   value     Decimal @db.Decimal(20, 2)
   count     Int?
 
+
   @@unique([bucket, period, type, aggregate, key_hash], map: "pulse_aggregates_bucket_period_type_aggregate_key_hash_unique")
   @@index([period, bucket], map: "pulse_aggregates_period_bucket_index")
   @@index([type], map: "pulse_aggregates_type_index")
