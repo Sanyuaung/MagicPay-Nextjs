@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { ZodError, z } from "zod";
 
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
