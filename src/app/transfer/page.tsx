@@ -171,12 +171,14 @@ function TransferContent() {
                     </div>
                   ) : null}
                   {message ? <p className="text-warning">{message}</p> : null}
-                  <button
-                    className="btn btn-theme w-md waves-effect waves-light"
-                    type="submit"
-                  >
-                    Continue
-                  </button>
+                  {!showConfirm ? (
+                    <button
+                      className="btn btn-theme w-md waves-effect waves-light"
+                      type="submit"
+                    >
+                      Continue
+                    </button>
+                  ) : null}
                 </form>
               </div>
             </div>
