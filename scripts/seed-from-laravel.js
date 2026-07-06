@@ -207,6 +207,7 @@ async function run() {
       prisma.adminUser.deleteMany(),
     ]);
 
+    
     const adminUsers = [
       {
         name: "Admin User",
