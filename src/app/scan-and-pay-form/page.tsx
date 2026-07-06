@@ -70,9 +70,7 @@ function ScanAndPayFormContent() {
       });
       router.push(`/transfer?${params.toString()}`);
     } catch {
-      setMessage(
-        "Unable to continue to transfer page. Please try again.",
-      );
+      setMessage("Unable to continue to transfer page. Please try again.");
     }
   };
 
