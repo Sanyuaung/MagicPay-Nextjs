@@ -1,0 +1,4 @@
+{
+    "prisma.pinToPrisma6": true,
+    "prisma.prismaFmtBinPath": "${workspaceFolder}/node_modules/@prisma/engines/schema-engine-windows.exe"
+}
