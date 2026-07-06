@@ -15,13 +15,16 @@ type QrScannerInstance = {
   destroy?: () => void;
 };
 
+type QrScannerOptions = {
+  returnDetailedScanResult?: boolean;
+  preferredCamera?: "environment" | "user";
+  onDecodeError?: (error: unknown) => void;
+};
+
 type QrScannerCtor = new (
   video: HTMLVideoElement,
   onDecode: (result: QrResult) => void,
-  options?: {
-    returnDetailedScanResult?: boolean;
-    preferredCamera?: "environment" | "user" | string;
-  },
+  options?: QrScannerOptions,
 ) => QrScannerInstance;
 
 declare global {
@@ -38,24 +41,6 @@ export default function Page() {
   const [isScriptReady, setIsScriptReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const scannerRef = useRef<QrScannerInstance | null>(null);
-
-  const navigateByQrContent = (rawResult: QrResult) => {
-    const qrContent =
-      typeof rawResult === "string" ? rawResult : (rawResult.data ?? "");
-    const normalized = qrContent.trim();
-
-    if (!normalized) {
-      return;
-    }
-
-    scannerRef.current?.stop();
-    scannerRef.current?.destroy?.();
-    scannerRef.current = null;
-    setShowScanModal(false);
-    router.push(
-      `/scan-and-pay-form?qrContent=${encodeURIComponent(normalized)}`,
-    );
-  };
 
   useEffect(() => {
     if (!showScanModal) {
@@ -74,11 +59,27 @@ export default function Page() {
     const scanner = new window.QrScanner(
       videoRef.current,
       (result) => {
-        navigateByQrContent(result);
+        const qrContent =
+          typeof result === "string" ? result : (result.data ?? "");
+
+        if (!qrContent) {
+          return;
+        }
+
+        scanner.stop();
+        scanner.destroy?.();
+        scannerRef.current = null;
+        setShowScanModal(false);
+        router.push(
+          `/scan-and-pay-form?qrContent=${encodeURIComponent(qrContent)}`,
+        );
       },
       {
         returnDetailedScanResult: true,
         preferredCamera: "environment",
+        onDecodeError: () => {
+          // Ignore frame-by-frame decode misses while camera is active.
+        },
       },
     );
 
@@ -100,7 +101,7 @@ export default function Page() {
   return (
     <>
       <Script
-        src="/frontend/js/qr-scanner.umd.min.js"
+        src="/frontend/js/qr-scanner.legacy.min.js"
         strategy="afterInteractive"
         onLoad={() => setIsScriptReady(true)}
       />
@@ -161,7 +162,13 @@ export default function Page() {
               />
             </div>
             <div className="card-body">
-              <video ref={videoRef} width="100%" height="100%" />
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                playsInline
+                style={{ width: "100%", borderRadius: 8 }}
+              />
               {scanError ? (
                 <p className="text-warning mt-3 mb-0">{scanError}</p>
               ) : null}
