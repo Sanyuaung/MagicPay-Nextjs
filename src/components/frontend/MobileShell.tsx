@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { apiGet, apiPost } from "@/lib/browser-api";
 import { clearToken } from "@/lib/browser-auth";
@@ -25,6 +25,7 @@ export function MobileShell({
     const pathname = usePathname();
     const router = useRouter();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
     const typeQuery = notificationType
         ? `?type=${encodeURIComponent(notificationType)}`
         : "";
@@ -45,6 +46,16 @@ export function MobileShell({
         setMenuOpen(false);
     };
 
+    const onNavigate = (href: string) => {
+        if (href !== pathname) {
+            setIsNavigating(true);
+        }
+    };
+
+    useEffect(() => {
+        setIsNavigating(false);
+    }, [pathname]);
+
     return (
         <div id="app" className="container-fluid">
             <div className="header-menu">
@@ -53,13 +64,20 @@ export function MobileShell({
                         <div className="row">
                             <div className="col-3 text-center">
                                 {backHref ? (
-                                    <Link href={backHref}>
+                                    <Link
+                                        href={backHref}
+                                        onClick={() => onNavigate(backHref)}
+                                    >
                                         <i className="mdi mdi-keyboard-backspace" />
                                     </Link>
                                 ) : null}
                             </div>
                             <div className="col-6 text-center">
-                                <Link href="/" className="logo-admin">
+                                <Link
+                                    href="/"
+                                    className="logo-admin"
+                                    onClick={() => onNavigate("/")}
+                                >
                                     <img
                                         src="/backend/assets/images/logo-sm.png"
                                         height={30}
@@ -145,6 +163,7 @@ export function MobileShell({
                                     <Link
                                         href="/notifications"
                                         className="logo-admin btn header-item noti-icon waves-effect"
+                                        onClick={() => onNavigate("/notifications")}
                                     >
                                         <i className="mdi mdi-bell-ring" />
                                         {notifications > 0 ? (
@@ -167,7 +186,11 @@ export function MobileShell({
             </div>
 
             <div className="bottom-menu">
-                <Link href="/scan-and-pay" className="scan-tab">
+                <Link
+                    href="/scan-and-pay"
+                    className="scan-tab"
+                    onClick={() => onNavigate("/scan-and-pay")}
+                >
                     <div className="inside">
                         <i className="mdi mdi-qrcode-scan" />
                     </div>
@@ -176,25 +199,34 @@ export function MobileShell({
                     <div className="col-md-8">
                         <div className="row">
                             <div className="col-3 text-center">
-                                <Link href="/">
+                                <Link href="/" onClick={() => onNavigate("/")}>
                                     <i className="mdi mdi-home" />
                                     <p>Home</p>
                                 </Link>
                             </div>
                             <div className="col-3 text-center">
-                                <Link href="/wallet">
+                                <Link
+                                    href="/wallet"
+                                    onClick={() => onNavigate("/wallet")}
+                                >
                                     <i className="mdi mdi-wallet" />
                                     <p>Wallet</p>
                                 </Link>
                             </div>
                             <div className="col-3 text-center">
-                                <Link href="/transactions">
+                                <Link
+                                    href="/transactions"
+                                    onClick={() => onNavigate("/transactions")}
+                                >
                                     <i className="mdi mdi-repeat" />
                                     <p>Transitions</p>
                                 </Link>
                             </div>
                             <div className="col-3 text-center">
-                                <Link href="/profile">
+                                <Link
+                                    href="/profile"
+                                    onClick={() => onNavigate("/profile")}
+                                >
                                     <i className="mdi mdi-account" />
                                     <p>Profile</p>
                                 </Link>
@@ -211,6 +243,22 @@ export function MobileShell({
             >
                 Logout
             </button>
+
+            {isNavigating ? (
+                <div
+                    className="global-action-loading"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <div className="global-action-loading-card">
+                        <span
+                            className="global-action-spinner"
+                            aria-hidden="true"
+                        />
+                        <span>Loading...</span>
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 }

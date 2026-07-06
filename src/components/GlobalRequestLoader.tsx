@@ -2,11 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-type RequestEventDetail = {
-  method: string;
-  isWrite: boolean;
-};
-
 export function GlobalRequestLoader() {
   const [barActive, setBarActive] = useState(false);
   const [overlayActive, setOverlayActive] = useState(false);
@@ -25,26 +20,17 @@ export function GlobalRequestLoader() {
 
   useEffect(() => {
     let pendingAll = 0;
-    let pendingWrite = 0;
 
-    const onStart = (event: Event) => {
-      const detail = (event as CustomEvent<RequestEventDetail>).detail;
+    const onStart = (_event: Event) => {
       pendingAll += 1;
-      if (detail?.isWrite) {
-        pendingWrite += 1;
-      }
       setBarActive(pendingAll > 0);
-      setOverlayActive(pendingWrite > 0);
+      setOverlayActive(pendingAll > 0);
     };
 
-    const onEnd = (event: Event) => {
-      const detail = (event as CustomEvent<RequestEventDetail>).detail;
+    const onEnd = (_event: Event) => {
       pendingAll = Math.max(0, pendingAll - 1);
-      if (detail?.isWrite) {
-        pendingWrite = Math.max(0, pendingWrite - 1);
-      }
       setBarActive(pendingAll > 0);
-      setOverlayActive(pendingWrite > 0);
+      setOverlayActive(pendingAll > 0);
     };
 
     window.addEventListener("magicpay:request-start", onStart);
