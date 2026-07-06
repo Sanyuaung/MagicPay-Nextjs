@@ -191,7 +191,29 @@ function TransferContent() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="p-3 text-white">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="route-skeleton" role="status" aria-live="polite">
+          <div className="route-skeleton-shell">
+            <div className="route-skeleton-card">
+              <div className="route-skeleton-line w-40" />
+              <div className="route-skeleton-line w-70 no-margin" />
+            </div>
+
+            <div className="route-skeleton-card">
+              <div className="route-skeleton-line w-90" />
+              <div className="route-skeleton-line w-85" />
+              <div className="route-skeleton-line w-80 no-margin" />
+            </div>
+
+            <div className="route-skeleton-card">
+              <div className="route-skeleton-line w-90" />
+              <div className="route-skeleton-box no-margin" />
+            </div>
+          </div>
+        </div>
+      }
+    >
       <TransferContent />
     </Suspense>
   );
