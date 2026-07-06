@@ -64,7 +64,7 @@ export async function POST(req: Request) {
       take: 1,
     });
 
-    return successResponse("Transfer confimation successfully!.", {
+    return successResponse("Transfer confirmation successful.", {
       transferAmount: payload.amount,
       notes: payload.notes,
       sender: toProfileResource(

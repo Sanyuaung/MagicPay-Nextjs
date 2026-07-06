@@ -1,7 +1,7 @@
 ﻿"use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { MobileShell } from "@/components/frontend/MobileShell";
 import { useProfile } from "@/components/frontend/useProfile";
@@ -9,6 +9,7 @@ import { apiPost } from "@/lib/browser-api";
 
 export default function Page() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { profile } = useProfile();
     const [toPhone, setToPhone] = useState("");
     const [amount, setAmount] = useState("");
@@ -18,8 +19,28 @@ export default function Page() {
     const [showBalance, setShowBalance] = useState(false);
     const [message, setMessage] = useState("");
 
-    const formattedBalance = Number(
-        profile?.wallet_balance ?? 0,
+    useEffect(() => {
+        const receiverParam = searchParams.get("receiver") || "";
+        const amountParam = searchParams.get("amount") || "";
+        const notesParam = searchParams.get("notes") || "";
+
+        if (receiverParam) {
+            setToPhone(receiverParam.replace(/\D/g, ""));
+        }
+        if (amountParam) {
+            setAmount(amountParam);
+        }
+        if (notesParam) {
+            setNotes(notesParam);
+        }
+    }, [searchParams]);
+
+    const balanceNumber = Number(
+        String(profile?.wallet_balance ?? "0").replace(/[^\d.-]/g, ""),
+    );
+    const formattedBalance = (Number.isFinite(balanceNumber)
+        ? balanceNumber
+        : 0
     ).toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,

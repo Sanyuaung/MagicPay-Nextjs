@@ -1,14 +1,15 @@
 ﻿"use client";
 
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { MobileShell } from "@/components/frontend/MobileShell";
 import { useProfile } from "@/components/frontend/useProfile";
-import { apiGet, apiPost } from "@/lib/browser-api";
+import { apiGet } from "@/lib/browser-api";
 
 function ScanAndPayFormContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const qrContent = searchParams.get("qrContent") || "";
   const { profile } = useProfile();
@@ -62,17 +63,15 @@ function ScanAndPayFormContent() {
     }
 
     try {
-      await apiPost("/api/transfer-confirm", {
+      const params = new URLSearchParams({
         receiver: normalizedReceiver,
-        amount: amountNumber,
+        amount: String(amountNumber),
         notes: trimmedNote,
       });
+      router.push(`/transfer?${params.toString()}`);
+    } catch {
       setMessage(
-        "Transfer confirmation success. Go to Transfer page to complete with PIN.",
-      );
-    } catch (err) {
-      setMessage(
-        err instanceof Error ? err.message : "Transfer confirmation failed",
+        "Unable to continue to transfer page. Please try again.",
       );
     }
   };
