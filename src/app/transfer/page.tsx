@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -7,7 +8,7 @@ import { MobileShell } from "@/components/frontend/MobileShell";
 import { useProfile } from "@/components/frontend/useProfile";
 import { apiPost } from "@/lib/browser-api";
 
-export default function Page() {
+function TransferContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { profile } = useProfile();
@@ -183,5 +184,13 @@ export default function Page() {
         </div>
       </div>
     </MobileShell>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="p-3 text-white">Loading...</div>}>
+      <TransferContent />
+    </Suspense>
   );
 }
