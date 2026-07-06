@@ -17,6 +17,8 @@ function ScanAndPayFormContent() {
     const [note, setNote] = useState("");
     const [message, setMessage] = useState("");
 
+    const normalizePhone = (value: string) => value.replace(/\D/g, "");
+
     useEffect(() => {
         const run = async () => {
             try {
@@ -29,7 +31,7 @@ function ScanAndPayFormContent() {
                 }>(
                     `/api/scan-and-pay-form?qrContent=${encodeURIComponent(qrContent)}`,
                 );
-                setReceiver(res.data.receiver.phone);
+                setReceiver(normalizePhone(res.data.receiver.phone || ""));
                 setAmount(res.data.amount || "");
                 setNote(res.data.note || "");
             } catch (err) {
@@ -45,11 +47,29 @@ function ScanAndPayFormContent() {
 
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const normalizedReceiver = normalizePhone(receiver);
+        const amountNumber = Number(amount);
+        const trimmedNote = note.trim();
+
+        if (!normalizedReceiver) {
+            setMessage("Receiver phone is required.");
+            return;
+        }
+        if (!Number.isFinite(amountNumber) || amountNumber < 1000) {
+            setMessage("Amount must be at least 1000 MMK.");
+            return;
+        }
+        if (!trimmedNote) {
+            setMessage("Notes are required.");
+            return;
+        }
+
         try {
             await apiPost("/api/transfer-confirm", {
-                receiver,
-                amount: Number(amount),
-                notes: note,
+                receiver: normalizedReceiver,
+                amount: amountNumber,
+                notes: trimmedNote,
             });
             setMessage(
                 "Transfer confirmation success. Go to Transfer page to complete with PIN.",
@@ -81,7 +101,11 @@ function ScanAndPayFormContent() {
                                             className="form-control"
                                             value={receiver}
                                             onChange={(e) =>
-                                                setReceiver(e.target.value)
+                                                setReceiver(
+                                                    normalizePhone(
+                                                        e.target.value,
+                                                    ),
+                                                )
                                             }
                                             required
                                         />
