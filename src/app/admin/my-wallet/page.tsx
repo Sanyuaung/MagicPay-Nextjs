@@ -88,9 +88,7 @@ export default function MyWalletPage() {
       });
       const res = await apiGet<{
         data: { items: AddAmountRequest[]; pagination: PaginationState };
-      }>(
-        `/api/admin/my-wallet/add-amount-requests?${params.toString()}`,
-      );
+      }>(`/api/admin/my-wallet/add-amount-requests?${params.toString()}`);
       setRequests(res.data?.items || []);
       setRequestPagination(
         res.data?.pagination || {
@@ -500,8 +498,8 @@ export default function MyWalletPage() {
                         ))}
                         <li
                           className={`page-item ${
-                            requestPagination.page >= requestPagination.totalPages ||
-                            isRequestLoading
+                            requestPagination.page >=
+                              requestPagination.totalPages || isRequestLoading
                               ? "disabled"
                               : ""
                           }`}
@@ -511,7 +509,10 @@ export default function MyWalletPage() {
                             className="page-link"
                             onClick={() =>
                               setRequestPage((prev) =>
-                                Math.min(requestPagination.totalPages, prev + 1),
+                                Math.min(
+                                  requestPagination.totalPages,
+                                  prev + 1,
+                                ),
                               )
                             }
                           >

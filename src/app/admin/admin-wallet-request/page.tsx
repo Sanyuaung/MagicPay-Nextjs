@@ -65,9 +65,7 @@ export default function AdminWalletRequestPage() {
 
       const res = await apiGet<{
         data: { items: WalletRequestItem[]; pagination: PaginationState };
-      }>(
-        `/api/admin/admin-wallet-requests?${params.toString()}`,
-      );
+      }>(`/api/admin/admin-wallet-requests?${params.toString()}`);
       setItems(res.data?.items || []);
       setPagination(
         res.data?.pagination || {
