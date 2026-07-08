@@ -77,14 +77,51 @@ model AdminUser {
   name           String    @db.VarChar(255)
   email          String    @unique @db.VarChar(255)
   phone          String    @unique @db.VarChar(255)
+  role           String    @default("admin") @db.VarChar(20)
   password       String    @db.VarChar(255)
   ip             String?   @db.VarChar(255)
   user_agent     String?   @db.Text
   remember_token String?   @db.VarChar(100)
   created_at     DateTime? @default(now()) @db.Timestamp(0)
   updated_at     DateTime? @default(now()) @db.Timestamp(0)
+  wallet         AdminWallet?
+  requested_topups AdminWalletRequest[] @relation("AdminWalletRequestRequester")
+  reviewed_topups  AdminWalletRequest[] @relation("AdminWalletRequestReviewer")
 
   @@map("admin_users")
+}
+
+model AdminWallet {
+  id             BigInt    @id @default(autoincrement())
+  admin_user_id  BigInt    @unique
+  account_number String    @unique @db.VarChar(255)
+  amount         Decimal   @default(0) @db.Decimal(20, 2)
+  created_at     DateTime? @default(now()) @db.Timestamp(0)
+  updated_at     DateTime? @default(now()) @db.Timestamp(0)
+  admin_user     AdminUser @relation(fields: [admin_user_id], references: [id], onDelete: Cascade)
+
+  @@index([admin_user_id], map: "admin_wallets_admin_user_id_index")
+  @@map("admin_wallets")
+}
+
+model AdminWalletRequest {
+  id                          BigInt     @id @default(autoincrement())
+  requester_admin_user_id     BigInt
+  amount                      Decimal    @db.Decimal(20, 2)
+  description                 String?    @db.Text
+  status                      String     @default("pending") @db.VarChar(20)
+  reviewed_by_admin_user_id   BigInt?
+  review_note                 String?    @db.Text
+  reviewed_at                 DateTime?  @db.Timestamp(0)
+  created_at                  DateTime?  @default(now()) @db.Timestamp(0)
+  updated_at                  DateTime?  @default(now()) @db.Timestamp(0)
+  requester                   AdminUser  @relation("AdminWalletRequestRequester", fields: [requester_admin_user_id], references: [id], onDelete: Cascade)
+  reviewer                    AdminUser? @relation("AdminWalletRequestReviewer", fields: [reviewed_by_admin_user_id], references: [id], onDelete: SetNull)
+
+  @@index([requester_admin_user_id], map: "admin_wallet_requests_requester_index")
+  @@index([status], map: "admin_wallet_requests_status_index")
+  @@index([created_at], map: "admin_wallet_requests_created_at_index")
+  @@map("admin_wallet_requests")
 }
 
 model SendInformation {

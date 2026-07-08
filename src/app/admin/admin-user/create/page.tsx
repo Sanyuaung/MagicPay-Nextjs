@@ -13,6 +13,7 @@ export default function AdminUserCreatePage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [role, setRole] = useState<"super_admin" | "admin">("admin");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
@@ -24,6 +25,7 @@ export default function AdminUserCreatePage() {
         name,
         email,
         phone,
+        role,
         password,
       });
       router.push(
@@ -86,6 +88,19 @@ export default function AdminUserCreatePage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Role</label>
+                <select
+                  className="form-select"
+                  value={role}
+                  onChange={(e) =>
+                    setRole(e.target.value as "super_admin" | "admin")
+                  }
+                >
+                  <option value="admin">admin</option>
+                  <option value="super_admin">super_admin</option>
+                </select>
               </div>
               {message ? (
                 <div className="col-12 text-danger">{message}</div>

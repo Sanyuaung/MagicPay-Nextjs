@@ -43,12 +43,14 @@ async function run() {
       update: {
         name: "Admin",
         phone: "09900000000",
+        role: "super_admin",
         password,
       },
       create: {
         name: "Admin",
         email: "admin@magicpay.local",
         phone: "09900000000",
+        role: "super_admin",
         password,
       },
     });

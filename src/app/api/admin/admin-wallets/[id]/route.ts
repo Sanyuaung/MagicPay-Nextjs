@@ -1,16 +1,11 @@
 import { z } from "zod";
-import bcrypt from "bcryptjs";
 
 import { getAdminUser, isSuperAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { errorResponse, successResponse } from "@/lib/response";
 
 const updateSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().regex(/^\d+$/),
-  role: z.enum(["super_admin", "admin"]).optional(),
-  password: z.string().min(6).optional().or(z.literal("")),
+  account_number: z.string().trim().min(1).optional(),
 });
 
 export async function GET(
@@ -24,20 +19,27 @@ export async function GET(
   }
 
   const { id } = await context.params;
-  const item = await prisma.adminUser.findUnique({
+
+  const item = await prisma.adminWallet.findUnique({
     where: { id: BigInt(id) },
+    include: { admin_user: true },
   });
-  if (!item) return errorResponse("Admin user not found.", {}, 404);
-  return successResponse("Admin user", {
+
+  if (!item) return errorResponse("Admin wallet not found.", {}, 404);
+
+  return successResponse("Admin wallet", {
     id: item.id.toString(),
-    name: item.name,
-    email: item.email,
-    phone: item.phone,
-    role: item.role,
-    ip: item.ip,
-    user_agent: item.user_agent,
+    admin_user_id: item.admin_user_id.toString(),
+    account_number: item.account_number,
+    amount: Number(item.amount).toFixed(2),
     created_at: item.created_at,
     updated_at: item.updated_at,
+    admin_user: {
+      id: item.admin_user.id.toString(),
+      name: item.admin_user.name,
+      email: item.admin_user.email,
+      phone: item.admin_user.phone,
+    },
   });
 }
 
@@ -52,28 +54,25 @@ export async function PUT(
   }
 
   const { id } = await context.params;
+
   try {
     const payload = updateSchema.parse(await req.json());
-    const updated = await prisma.adminUser.update({
+
+    const updated = await prisma.adminWallet.update({
       where: { id: BigInt(id) },
       data: {
-        name: payload.name,
-        email: payload.email,
-        phone: payload.phone,
-        ...(payload.role ? { role: payload.role } : {}),
-        ...(payload.password
-          ? { password: await bcrypt.hash(payload.password, 12) }
+        ...(payload.account_number
+          ? { account_number: payload.account_number }
           : {}),
+        updated_at: new Date(),
       },
     });
-    return successResponse("Admin user updated successfully.", {
+
+    return successResponse("Admin wallet updated successfully.", {
       id: updated.id.toString(),
-      name: updated.name,
-      email: updated.email,
-      phone: updated.phone,
-      role: updated.role,
-      ip: updated.ip,
-      user_agent: updated.user_agent,
+      admin_user_id: updated.admin_user_id.toString(),
+      account_number: updated.account_number,
+      amount: Number(updated.amount).toFixed(2),
       created_at: updated.created_at,
       updated_at: updated.updated_at,
     });
@@ -93,10 +92,7 @@ export async function DELETE(
   }
 
   const { id } = await context.params;
-  const adminId = BigInt(id);
-  await prisma.$transaction([
-    prisma.adminWallet.deleteMany({ where: { admin_user_id: adminId } }),
-    prisma.adminUser.delete({ where: { id: adminId } }),
-  ]);
-  return successResponse("Admin user deleted successfully.", []);
+  await prisma.adminWallet.delete({ where: { id: BigInt(id) } });
+
+  return successResponse("Admin wallet deleted successfully.", []);
 }

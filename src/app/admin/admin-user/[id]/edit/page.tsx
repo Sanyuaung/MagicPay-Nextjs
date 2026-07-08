@@ -8,7 +8,13 @@ import { PhoneTextInput } from "@/components/PhoneTextInput";
 import { apiGet, apiPut } from "@/lib/browser-api";
 import { withAdminToast } from "@/lib/admin-toast";
 
-type AdminUser = { id: string; name: string; email: string; phone: string };
+type AdminUser = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: "super_admin" | "admin";
+};
 
 export default function AdminUserEditPage() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +22,7 @@ export default function AdminUserEditPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [role, setRole] = useState<"super_admin" | "admin">("admin");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
@@ -27,6 +34,7 @@ export default function AdminUserEditPage() {
       setName(res.data.name);
       setEmail(res.data.email);
       setPhone(res.data.phone);
+      setRole(res.data.role);
     };
     void run().catch(() => undefined);
   }, [id]);
@@ -39,6 +47,7 @@ export default function AdminUserEditPage() {
         name,
         email,
         phone,
+        role,
         password,
       });
       router.push(
@@ -96,6 +105,19 @@ export default function AdminUserEditPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Role</label>
+                <select
+                  className="form-select"
+                  value={role}
+                  onChange={(e) =>
+                    setRole(e.target.value as "super_admin" | "admin")
+                  }
+                >
+                  <option value="admin">admin</option>
+                  <option value="super_admin">super_admin</option>
+                </select>
               </div>
               {message ? (
                 <div className="col-12 text-danger">{message}</div>
