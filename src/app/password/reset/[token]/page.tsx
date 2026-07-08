@@ -7,166 +7,231 @@ import { useEffect, useState } from "react";
 import { apiPost } from "@/lib/browser-api";
 
 export default function PasswordResetTokenPage() {
-    const params = useParams<{ token: string }>();
-    const token = typeof params?.token === "string" ? params.token : "";
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [passwordConfirmation, setPasswordConfirmation] = useState("");
-    const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false);
+  const params = useParams<{ token: string }>();
+  const token = typeof params?.token === "string" ? params.token : "";
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error" | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(false);
+  const getPasswordStrength = (value: string) => {
+    if (!value) {
+      return null;
+    }
 
-    useEffect(() => {
-        const query = new URLSearchParams(window.location.search);
-        setEmail(query.get("email") || "");
-    }, []);
+    const checks = [
+      value.length >= 8,
+      /[a-z]/.test(value),
+      /[A-Z]/.test(value),
+      /\d/.test(value),
+      /[^A-Za-z0-9]/.test(value),
+    ];
 
-    const submit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setMessage("");
-        setLoading(true);
+    const score = checks.filter(Boolean).length;
+    if (score <= 2) {
+      return { label: "Poor", tone: "text-danger" };
+    }
+    if (score === 3) {
+      return { label: "Weak", tone: "text-warning" };
+    }
+    if (score === 4) {
+      return { label: "Average", tone: "text-info" };
+    }
+    return { label: "Strong", tone: "text-success" };
+  };
 
-        try {
-            const res = await apiPost<{ message: string }>(
-                "/api/password/reset",
-                {
-                    email,
-                    token,
-                    password,
-                    password_confirmation: passwordConfirmation,
-                },
-            );
-            setMessage(res.message || "Password reset successfully!");
-            setPassword("");
-            setPasswordConfirmation("");
-        } catch (err) {
-            setMessage(
-                err instanceof Error ? err.message : "Password reset failed",
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+  const passwordStrength = (() => {
+    return getPasswordStrength(password);
+  })();
+  const passwordsMatch =
+    passwordConfirmation.length > 0 ? password === passwordConfirmation : null;
 
-    return (
-        <div className="account-pages my-5">
-            <div className="container">
-                <div className="row justify-content-center">
-                    <div className="col-md-8 col-lg-6 col-xl-4">
-                        <div className="card overflow-hidden">
-                            <div className="bg-theme">
-                                <div className="text-primary text-center p-4">
-                                    <h5 className="text-white font-size-20 p-2">
-                                        Set New Password
-                                    </h5>
-                                    <Link href="/" className="logo logo-admin">
-                                        <img
-                                            src="/backend/assets/images/logo-sm.png"
-                                            height="24"
-                                            alt="logo"
-                                        />
-                                    </Link>
-                                </div>
-                            </div>
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    setEmail(query.get("email") || "");
+  }, []);
 
-                            <div className="card-body bg-theme p-4">
-                                <div className="p-3">
-                                    <form className="mt-4" onSubmit={submit}>
-                                        <div className="mb-3">
-                                            <label
-                                                className="text-white form-label"
-                                                htmlFor="resetEmail"
-                                            >
-                                                Email
-                                            </label>
-                                            <input
-                                                id="resetEmail"
-                                                type="email"
-                                                className="form-control"
-                                                value={email}
-                                                onChange={(e) =>
-                                                    setEmail(e.target.value)
-                                                }
-                                                required
-                                            />
-                                        </div>
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage("");
+    setMessageType(null);
 
-                                        <div className="mb-3">
-                                            <label
-                                                className="text-white form-label"
-                                                htmlFor="newPassword"
-                                            >
-                                                New Password
-                                            </label>
-                                            <input
-                                                id="newPassword"
-                                                type="password"
-                                                className="form-control"
-                                                value={password}
-                                                onChange={(e) =>
-                                                    setPassword(e.target.value)
-                                                }
-                                                minLength={8}
-                                                required
-                                            />
-                                        </div>
+    if (passwordStrength?.label !== "Strong") {
+      setMessage(
+        "Password is not strong yet. Use uppercase, lowercase, number and special character.",
+      );
+      setMessageType("error");
+      return;
+    }
 
-                                        <div className="mb-3">
-                                            <label
-                                                className="text-white form-label"
-                                                htmlFor="confirmPassword"
-                                            >
-                                                Confirm Password
-                                            </label>
-                                            <input
-                                                id="confirmPassword"
-                                                type="password"
-                                                className="form-control"
-                                                value={passwordConfirmation}
-                                                onChange={(e) =>
-                                                    setPasswordConfirmation(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                minLength={8}
-                                                required
-                                            />
-                                        </div>
+    if (!passwordsMatch) {
+      setMessage("Password and Confirm Password are not the same.");
+      setMessageType("error");
+      return;
+    }
 
-                                        {message ? (
-                                            <p className="text-white-50">
-                                                {message}
-                                            </p>
-                                        ) : null}
+    setLoading(true);
 
-                                        <div className="row mb-0">
-                                            <div className="col-12 text-end">
-                                                <button
-                                                    className="btn btn-theme w-md waves-effect waves-light"
-                                                    type="submit"
-                                                    disabled={loading || !token}
-                                                >
-                                                    {loading
-                                                        ? "Saving..."
-                                                        : "Reset Password"}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
+    try {
+      const res = await apiPost<{ message: string }>("/api/password/reset", {
+        email,
+        token,
+        password,
+        password_confirmation: passwordConfirmation,
+      });
+      setMessage(res.message || "Password reset successfully!");
+      setMessageType("success");
+      setPassword("");
+      setPasswordConfirmation("");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Password reset failed");
+      setMessageType("error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                                    <p className="mt-3 mb-0 text-white-50">
-                                        <Link
-                                            href="/login"
-                                            className="text-warning"
-                                        >
-                                            Back to Sign In
-                                        </Link>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  return (
+    <div className="account-pages my-5">
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-md-8 col-lg-6 col-xl-4">
+            <div className="card overflow-hidden">
+              <div className="bg-theme">
+                <div className="text-primary text-center p-4">
+                  <h5 className="text-white font-size-20 p-2">
+                    Set New Password
+                  </h5>
+                  <Link href="/" className="logo logo-admin">
+                    <img
+                      src="/backend/assets/images/logo-sm.png"
+                      height="24"
+                      alt="logo"
+                    />
+                  </Link>
                 </div>
+              </div>
+
+              <div className="card-body bg-theme p-4">
+                <div className="p-3">
+                  <form className="mt-4" onSubmit={submit}>
+                    <div className="mb-3">
+                      <label
+                        className="text-white form-label"
+                        htmlFor="resetEmail"
+                      >
+                        Email
+                      </label>
+                      <input
+                        id="resetEmail"
+                        type="email"
+                        className="form-control"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label
+                        className="text-white form-label"
+                        htmlFor="newPassword"
+                      >
+                        New Password
+                      </label>
+                      <input
+                        id="newPassword"
+                        type="password"
+                        className="form-control"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        minLength={8}
+                        required
+                      />
+                      {passwordStrength ? (
+                        <p className={`${passwordStrength.tone} small mt-2`}>
+                          Password Strength: {passwordStrength.label}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <div className="mb-3">
+                      <label
+                        className="text-white form-label"
+                        htmlFor="confirmPassword"
+                      >
+                        Confirm Password
+                      </label>
+                      <input
+                        id="confirmPassword"
+                        type="password"
+                        className="form-control"
+                        value={passwordConfirmation}
+                        onChange={(e) =>
+                          setPasswordConfirmation(e.target.value)
+                        }
+                        minLength={8}
+                        required
+                      />
+                      {passwordsMatch !== null ? (
+                        <p
+                          className={
+                            passwordsMatch
+                              ? "text-success small mt-2"
+                              : "text-warning small mt-2"
+                          }
+                        >
+                          {passwordsMatch
+                            ? "Password and Confirm Password match."
+                            : "Password and Confirm Password do not match."}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    {message ? (
+                      <p
+                        className={
+                          messageType === "success"
+                            ? "text-success"
+                            : "text-warning"
+                        }
+                      >
+                        {message}
+                      </p>
+                    ) : null}
+
+                    <div className="row mb-0">
+                      <div className="col-12 text-end">
+                        <button
+                          className="btn btn-theme w-md waves-effect waves-light"
+                          type="submit"
+                          disabled={
+                            loading ||
+                            !token ||
+                            passwordStrength?.label !== "Strong" ||
+                            passwordsMatch === false
+                          }
+                        >
+                          {loading ? "Saving..." : "Reset Password"}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+
+                  <p className="mt-3 mb-0 text-white-50">
+                    <Link href="/login" className="text-warning">
+                      Back to Sign In
+                    </Link>
+                  </p>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

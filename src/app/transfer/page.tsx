@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { MobileShell } from "@/components/frontend/MobileShell";
+import { PhoneTextInput } from "@/components/PhoneTextInput";
 import { useProfile } from "@/components/frontend/useProfile";
 import { apiPost } from "@/lib/browser-api";
 
@@ -100,12 +101,11 @@ function TransferContent() {
                   <hr />
                   <div className="mb-4">
                     <label className="form-label">To</label>
-                    <input
+                    <PhoneTextInput
                       className="form-control"
-                      type="number"
                       placeholder="Please enter phone number"
                       value={toPhone}
-                      onChange={(e) => setToPhone(e.target.value)}
+                      onValueChange={setToPhone}
                       required
                     />
                   </div>

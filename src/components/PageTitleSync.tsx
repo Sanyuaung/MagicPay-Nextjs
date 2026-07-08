@@ -6,63 +6,65 @@ import { useEffect } from "react";
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Magic Pay";
 
 function cleanTitle(raw: string | null | undefined): string {
-    if (!raw) return "";
-    return raw
-        .replace(/\s+/g, " ")
-        .replace(/^[^A-Za-z0-9]+/, "")
-        .trim();
+  if (!raw) return "";
+  return raw
+    .replace(/\s+/g, " ")
+    .replace(/^[^A-Za-z0-9]+/, "")
+    .trim();
 }
 
 function fallbackTitleFromPath(pathname: string): string {
-    if (!pathname || pathname === "/") return "Home";
+  if (!pathname || pathname === "/") return "Home";
 
-    const last = pathname.split("/").filter(Boolean).pop();
+  const last = pathname.split("/").filter(Boolean).pop();
 
-    if (!last) return "";
+  if (!last) return "";
 
-    const decoded = decodeURIComponent(last)
-        .replace(/[-_]/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+  const decoded = decodeURIComponent(last)
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 
-    return decoded;
+  return decoded;
 }
 
 function getCurrentPageTitle(pathname: string): string {
-    const candidates = [
-        ".page-title-box .page-title",
-        ".logo-admin h3",
-        "h5.text-white.font-size-20",
-        "main h1",
-        "main h2",
-        "main h3",
-    ];
+  if (pathname === "/") {
+    return "Home";
+  }
 
-    for (const selector of candidates) {
-        const text = cleanTitle(document.querySelector(selector)?.textContent);
-        if (text) return text;
-    }
+  const candidates = [
+    ".page-title-box .page-title",
+    ".logo-admin h3",
+    "h5.text-white.font-size-20",
+    "main h1",
+    "main h2",
+    "main h3",
+  ];
 
-    return fallbackTitleFromPath(pathname);
+  for (const selector of candidates) {
+    const text = cleanTitle(document.querySelector(selector)?.textContent);
+    if (text) return text;
+  }
+
+  return fallbackTitleFromPath(pathname);
 }
 
 export function PageTitleSync() {
-    const pathname = usePathname();
+  const pathname = usePathname();
 
-    useEffect(() => {
-        const setTitle = () => {
-            const pageTitle = getCurrentPageTitle(pathname);
-            document.title = pageTitle
-                ? `${APP_NAME} || ${pageTitle}`
-                : APP_NAME;
-        };
+  useEffect(() => {
+    const setTitle = () => {
+      const pageTitle = getCurrentPageTitle(pathname);
+      document.title = pageTitle ? `${APP_NAME} || ${pageTitle}` : APP_NAME;
+    };
 
-        setTitle();
-        const timer = window.setTimeout(setTitle, 120);
+    setTitle();
+    const timer = window.setTimeout(setTitle, 120);
 
-        return () => {
-            window.clearTimeout(timer);
-        };
-    }, [pathname]);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [pathname]);
 
-    return null;
+  return null;
 }
