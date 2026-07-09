@@ -116,6 +116,26 @@ type DashboardAnalyticsResponse = {
   data?: DashboardAnalyticsData;
 };
 
+type WalletRequestNotice = {
+  id: string;
+  amount: string;
+  status: "pending" | "approved" | "rejected" | string;
+  requester_name: string;
+  requester_email: string;
+  reviewer_name: string;
+  reviewer_email: string;
+  review_note: string;
+  created_at: string | null;
+  reviewed_at: string | null;
+  updated_at: string | null;
+};
+
+type WalletRequestNotificationsResponse = {
+  data?: {
+    items?: WalletRequestNotice[];
+  };
+};
+
 type InsightCard = {
   label: string;
   value: string;
@@ -212,6 +232,11 @@ export default function AdminHomePage() {
   const [chartRangeDays, setChartRangeDays] = useState<7 | 30 | 90>(7);
   const [chartAnalyticsLoading, setChartAnalyticsLoading] = useState(true);
   const [chartAnalyticsError, setChartAnalyticsError] = useState("");
+  const [workflowNotices, setWorkflowNotices] = useState<WalletRequestNotice[]>(
+    [],
+  );
+  const [workflowNoticesLoading, setWorkflowNoticesLoading] = useState(true);
+  const [workflowNoticesError, setWorkflowNoticesError] = useState("");
   const previousInsightValues = useRef<Record<string, number>>({});
 
   useEffect(() => {
@@ -435,6 +460,41 @@ export default function AdminHomePage() {
       window.clearInterval(analyticsRefresh);
     };
   }, [adminProfile?.role, chartRangeDays]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadWorkflowNotices = async () => {
+      setWorkflowNoticesLoading(true);
+      setWorkflowNoticesError("");
+
+      try {
+        const res = await apiGet<WalletRequestNotificationsResponse>(
+          "/api/admin/wallet-request-notifications",
+        );
+
+        if (isCancelled) return;
+        setWorkflowNotices(res.data?.items ?? []);
+      } catch {
+        if (isCancelled) return;
+        setWorkflowNotices([]);
+        setWorkflowNoticesError("Unable to load workflow notifications.");
+      } finally {
+        if (!isCancelled) setWorkflowNoticesLoading(false);
+      }
+    };
+
+    void loadWorkflowNotices();
+
+    const noticeRefresh = window.setInterval(() => {
+      void loadWorkflowNotices();
+    }, 60 * 1000);
+
+    return () => {
+      isCancelled = true;
+      window.clearInterval(noticeRefresh);
+    };
+  }, [adminProfile?.role]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -1014,6 +1074,99 @@ export default function AdminHomePage() {
         <div className="card admin-dashboard-analysis-card">
           <div className="card-body py-3">
             <div className="admin-dashboard-analysis-header">
+              <h4 className="mb-0">Workflow Notifications</h4>
+              <small className="text-muted">
+                Latest wallet request updates for your role
+              </small>
+            </div>
+
+            {workflowNoticesError ? (
+              <div className="alert alert-warning mb-0 mt-3 py-2" role="alert">
+                {workflowNoticesError}
+              </div>
+            ) : null}
+
+            <div className="table-responsive mt-2">
+              <table className="table table-sm table-bordered mb-0">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Requester</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Updated</th>
+                    <th>Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {workflowNoticesLoading ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-3">
+                        Loading notifications...
+                      </td>
+                    </tr>
+                  ) : null}
+
+                  {!workflowNoticesLoading
+                    ? workflowNotices.map((item) => (
+                        <tr key={item.id}>
+                          <td>{item.id}</td>
+                          <td>
+                            <div>{item.requester_name}</div>
+                            <small className="text-muted">
+                              {item.requester_email}
+                            </small>
+                          </td>
+                          <td>{item.amount}</td>
+                          <td>
+                            <span
+                              className={`badge ${
+                                item.status === "approved"
+                                  ? "bg-success"
+                                  : item.status === "rejected"
+                                    ? "bg-danger"
+                                    : "bg-warning text-dark"
+                              }`}
+                            >
+                              {item.status}
+                            </span>
+                          </td>
+                          <td>
+                            {item.updated_at
+                              ? new Date(item.updated_at).toLocaleString(
+                                  "en-GB",
+                                  {
+                                    day: "2-digit",
+                                    month: "short",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  },
+                                )
+                              : "-"}
+                          </td>
+                          <td>{item.review_note || "-"}</td>
+                        </tr>
+                      ))
+                    : null}
+
+                  {!workflowNoticesLoading && workflowNotices.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-3">
+                        No workflow notifications yet.
+                      </td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="col-12 mt-2">
+        <div className="card admin-dashboard-analysis-card">
+          <div className="card-body py-3">
+            <div className="admin-dashboard-analysis-header">
               <h4 className="mb-0">All Chart Types</h4>
               <small className="text-muted">
                 Unified visual analytics for both admin roles (
@@ -1065,7 +1218,11 @@ export default function AdminHomePage() {
 
               <div className="col-12 col-xl-6">
                 <div className="admin-dashboard-chart-card">
-                  <h6>Daily Top-Up Amount</h6>
+                  <h6>
+                    {isSuperAdmin
+                      ? "Daily Request vs Approved Amount"
+                      : "Daily Request Amount"}
+                  </h6>
                   <div className="admin-dashboard-chart-body">
                     <Bar data={barChartDataset} options={commonChartOptions} />
                   </div>

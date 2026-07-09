@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { errorResponse, successResponse } from "@/lib/response";
 
 const schema = z.object({
-  review_note: z.string().trim().min(1),
+  review_note: z.string().trim().min(1).max(500),
 });
 
 export async function POST(

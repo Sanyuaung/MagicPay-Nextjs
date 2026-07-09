@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { errorResponse, successResponse } from "@/lib/response";
 
 const schema = z.object({
-  review_note: z.string().trim().optional(),
+  review_note: z.string().trim().min(1).max(500),
 });
 
 export async function POST(
@@ -56,7 +56,7 @@ export async function POST(
         data: {
           status: "approved",
           reviewed_by_admin_user_id: admin.id,
-          review_note: payload.review_note || "",
+          review_note: payload.review_note,
           reviewed_at: new Date(),
           updated_at: new Date(),
         },

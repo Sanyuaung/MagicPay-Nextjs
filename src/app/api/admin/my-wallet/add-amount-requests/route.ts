@@ -19,8 +19,28 @@ export async function GET(req: Request) {
     100,
     Math.max(1, Number(url.searchParams.get("pageSize") || 10)),
   );
+  const status = (url.searchParams.get("status") || "").trim().toLowerCase();
+  const from = (url.searchParams.get("from") || "").trim();
+  const to = (url.searchParams.get("to") || "").trim();
 
-  const where = { requester_admin_user_id: admin.id };
+  const fromDate = from ? new Date(`${from}T00:00:00.000Z`) : null;
+  const toDate = to ? new Date(`${to}T00:00:00.000Z`) : null;
+
+  const createdAtFilter: { gte?: Date; lt?: Date } = {};
+  if (fromDate && !Number.isNaN(fromDate.getTime())) {
+    createdAtFilter.gte = fromDate;
+  }
+  if (toDate && !Number.isNaN(toDate.getTime())) {
+    createdAtFilter.lt = new Date(toDate.getTime() + 24 * 60 * 60 * 1000);
+  }
+
+  const where = {
+    requester_admin_user_id: admin.id,
+    ...(status ? { status } : {}),
+    ...(Object.keys(createdAtFilter).length > 0
+      ? { created_at: createdAtFilter }
+      : {}),
+  };
 
   const total = await prisma.adminWalletRequest.count({ where });
   const totalPages = Math.max(1, Math.ceil(total / pageSize));

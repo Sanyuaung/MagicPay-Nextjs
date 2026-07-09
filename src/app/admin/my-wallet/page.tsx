@@ -43,6 +43,9 @@ export default function MyWalletPage() {
   const [requests, setRequests] = useState<AddAmountRequest[]>([]);
   const [requestPage, setRequestPage] = useState(1);
   const [requestPageSize, setRequestPageSize] = useState(10);
+  const [requestStatusFilter, setRequestStatusFilter] = useState("");
+  const [requestFromDate, setRequestFromDate] = useState("");
+  const [requestToDate, setRequestToDate] = useState("");
   const [requestPagination, setRequestPagination] = useState<PaginationState>({
     page: 1,
     pageSize: 10,
@@ -86,6 +89,15 @@ export default function MyWalletPage() {
         page: String(requestPage),
         pageSize: String(requestPageSize),
       });
+      if (requestStatusFilter.trim()) {
+        params.set("status", requestStatusFilter.trim());
+      }
+      if (requestFromDate) {
+        params.set("from", requestFromDate);
+      }
+      if (requestToDate) {
+        params.set("to", requestToDate);
+      }
       const res = await apiGet<{
         data: { items: AddAmountRequest[]; pagination: PaginationState };
       }>(`/api/admin/my-wallet/add-amount-requests?${params.toString()}`);
@@ -116,7 +128,18 @@ export default function MyWalletPage() {
   useEffect(() => {
     if (!wallet) return;
     void loadRequests().catch(() => undefined);
-  }, [wallet?.admin_role, requestPage, requestPageSize]);
+  }, [
+    wallet?.admin_role,
+    requestPage,
+    requestPageSize,
+    requestStatusFilter,
+    requestFromDate,
+    requestToDate,
+  ]);
+
+  useEffect(() => {
+    setRequestPage(1);
+  }, [requestStatusFilter, requestFromDate, requestToDate]);
 
   const submitAmountAction = async (mode: "add" | "reduce") => {
     if (!wallet?.admin_user_id) return;
@@ -216,6 +239,10 @@ export default function MyWalletPage() {
 
     return buttons;
   };
+
+  const recentRequestUpdates = requests.filter(
+    (item) => item.status === "approved" || item.status === "rejected",
+  );
 
   return (
     <AdminShell
@@ -381,7 +408,69 @@ export default function MyWalletPage() {
 
                     <hr className="my-4" />
 
-                    <h5 className="mb-3">My Top-up Requests</h5>
+                    <h5 className="mb-3">My Top-up Request Timeline</h5>
+
+                    {recentRequestUpdates.length > 0 ? (
+                      <div className="alert alert-info py-2" role="alert">
+                        Latest updates: {recentRequestUpdates.length} reviewed
+                        request{recentRequestUpdates.length > 1 ? "s" : ""}
+                        on this page.
+                      </div>
+                    ) : null}
+
+                    <div className="row g-3 mb-3">
+                      <div className="col-md-3">
+                        <label className="form-label">Status</label>
+                        <select
+                          className="form-select"
+                          value={requestStatusFilter}
+                          onChange={(event) =>
+                            setRequestStatusFilter(event.target.value)
+                          }
+                        >
+                          <option value="">All</option>
+                          <option value="pending">Pending</option>
+                          <option value="approved">Approved</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
+                      <div className="col-md-3">
+                        <label className="form-label">From Date</label>
+                        <input
+                          type="date"
+                          className="form-control"
+                          value={requestFromDate}
+                          onChange={(event) =>
+                            setRequestFromDate(event.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="col-md-3">
+                        <label className="form-label">To Date</label>
+                        <input
+                          type="date"
+                          className="form-control"
+                          value={requestToDate}
+                          onChange={(event) =>
+                            setRequestToDate(event.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="col-md-3 d-flex align-items-end">
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary w-100"
+                          onClick={() => {
+                            setRequestStatusFilter("");
+                            setRequestFromDate("");
+                            setRequestToDate("");
+                          }}
+                        >
+                          Reset Filters
+                        </button>
+                      </div>
+                    </div>
+
                     <div className="table-responsive">
                       <table className="table table-bordered mb-0">
                         <thead>
@@ -391,6 +480,7 @@ export default function MyWalletPage() {
                             <th>Description</th>
                             <th>Status</th>
                             <th>Review Note</th>
+                            <th>Reviewed By</th>
                             <th>Reviewed At</th>
                             <th>Created At</th>
                           </tr>
@@ -398,7 +488,7 @@ export default function MyWalletPage() {
                         <tbody>
                           {isRequestLoading ? (
                             <tr>
-                              <td colSpan={7} className="text-center py-3">
+                              <td colSpan={8} className="text-center py-3">
                                 Loading requests...
                               </td>
                             </tr>
@@ -417,6 +507,11 @@ export default function MyWalletPage() {
                                     </span>
                                   </td>
                                   <td>{item.review_note || "-"}</td>
+                                  <td>
+                                    {item.reviewer
+                                      ? `${item.reviewer.name} (${item.reviewer.email})`
+                                      : "-"}
+                                  </td>
                                   <td>{formatDateTime(item.reviewed_at)}</td>
                                   <td>{formatDateTime(item.created_at)}</td>
                                 </tr>
@@ -424,7 +519,7 @@ export default function MyWalletPage() {
                             : null}
                           {!isRequestLoading && requests.length === 0 ? (
                             <tr>
-                              <td colSpan={7} className="text-center py-3">
+                              <td colSpan={8} className="text-center py-3">
                                 No requests yet.
                               </td>
                             </tr>

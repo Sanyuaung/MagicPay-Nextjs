@@ -6,6 +6,15 @@ import { Suspense, type ReactNode, useEffect, useRef, useState } from "react";
 
 import { apiGet, apiPost } from "@/lib/browser-api";
 
+type HeaderWorkflowNotice = {
+  id: string;
+  amount: string;
+  status: string;
+  requester_name: string;
+  review_note: string;
+  updated_at: string | null;
+};
+
 function AdminToastReader({
   pathname,
   onResolve,
@@ -64,10 +73,16 @@ export function AdminShell({
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isNotificationMenuOpen, setIsNotificationMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "error">("success");
   const [adminRole, setAdminRole] = useState<string>("");
+  const [pendingWorkflowCount, setPendingWorkflowCount] = useState(0);
+  const [headerWorkflowNotices, setHeaderWorkflowNotices] = useState<
+    HeaderWorkflowNotice[]
+  >([]);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
+  const notificationMenuRef = useRef<HTMLDivElement | null>(null);
   const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || "App";
 
   useEffect(() => {
@@ -111,6 +126,9 @@ export function AdminShell({
       if (!profileMenuRef.current?.contains(target)) {
         setIsProfileMenuOpen(false);
       }
+      if (!notificationMenuRef.current?.contains(target)) {
+        setIsNotificationMenuOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", onDocumentClick);
@@ -137,14 +155,42 @@ export function AdminShell({
         const res = await apiGet<{ data?: { role?: string } }>(
           "/api/admin/profile",
         );
-        setAdminRole(res.data?.role || "");
+        const role = res.data?.role || "";
+        setAdminRole(role);
+
+        try {
+          const noticeRes = await apiGet<{
+            data?: {
+              items?: HeaderWorkflowNotice[];
+              pagination?: { total?: number };
+            };
+          }>(
+            "/api/admin/wallet-request-notifications?page=1&pageSize=5&status=pending",
+          );
+
+          setPendingWorkflowCount(noticeRes.data?.pagination?.total ?? 0);
+          setHeaderWorkflowNotices(noticeRes.data?.items || []);
+        } catch {
+          setPendingWorkflowCount(0);
+          setHeaderWorkflowNotices([]);
+        }
       } catch {
         setAdminRole("");
+        setPendingWorkflowCount(0);
+        setHeaderWorkflowNotices([]);
       }
     };
 
     void run().catch(() => undefined);
-  }, []);
+
+    const intervalId = window.setInterval(() => {
+      void run().catch(() => undefined);
+    }, 60 * 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [pathname]);
 
   const isCreateOrEdit =
     pathname.includes("/create") ||
@@ -251,6 +297,98 @@ export function AdminShell({
           </div>
 
           <div className="d-flex admin-topbar-right">
+            <div
+              className="dropdown d-inline-block me-2"
+              ref={notificationMenuRef}
+            >
+              <button
+                type="button"
+                className="btn header-item waves-effect position-relative admin-notification-trigger"
+                aria-haspopup="true"
+                aria-expanded={isNotificationMenuOpen}
+                onClick={() => setIsNotificationMenuOpen((prev) => !prev)}
+              >
+                <i className="mdi mdi-bell-outline font-size-24" />
+                {pendingWorkflowCount > 0 ? (
+                  <span className="badge bg-danger rounded-pill position-absolute admin-notification-badge">
+                    {pendingWorkflowCount}
+                  </span>
+                ) : null}
+              </button>
+              <div
+                className={`dropdown-menu dropdown-menu-end p-0 ${
+                  isNotificationMenuOpen ? "show" : ""
+                }`}
+                style={{ minWidth: 320 }}
+              >
+                <div className="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+                  <strong>Notifications</strong>
+                  <span className="badge bg-danger">
+                    {pendingWorkflowCount}
+                  </span>
+                </div>
+                <div style={{ maxHeight: 320, overflowY: "auto" }}>
+                  {headerWorkflowNotices.length > 0 ? (
+                    headerWorkflowNotices.map((item) => (
+                      <Link
+                        key={item.id}
+                        href="/admin/admin-wallet-request"
+                        className="dropdown-item py-2"
+                        onClick={() => setIsNotificationMenuOpen(false)}
+                      >
+                        <div className="d-flex justify-content-between">
+                          <strong>{item.requester_name}</strong>
+                          <span
+                            className={`badge ${
+                              item.status === "approved"
+                                ? "bg-success"
+                                : item.status === "rejected"
+                                  ? "bg-danger"
+                                  : "bg-warning text-dark"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                        <small className="d-block text-muted">
+                          Amount: {item.amount}
+                        </small>
+                        <small className="d-block text-muted">
+                          {item.review_note || "No review note"}
+                        </small>
+                        <small className="d-block text-muted">
+                          {item.updated_at
+                            ? new Date(item.updated_at).toLocaleString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )
+                            : "-"}
+                        </small>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="px-3 py-3 text-muted small">
+                      No recent notifications.
+                    </div>
+                  )}
+                </div>
+                <div className="border-top p-2 text-center">
+                  <Link
+                    href="/admin/admin-wallet-request"
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={() => setIsNotificationMenuOpen(false)}
+                  >
+                    Open Wallet Requests
+                  </Link>
+                </div>
+              </div>
+            </div>
+
             <div className="dropdown d-inline-block" ref={profileMenuRef}>
               <button
                 type="button"
@@ -278,14 +416,16 @@ export function AdminShell({
                   <i className="mdi mdi-account-circle font-size-17 align-middle me-1" />
                   Profile
                 </Link>
-                <Link
-                  className="dropdown-item"
-                  href="/admin/my-wallet"
-                  onClick={() => setIsProfileMenuOpen(false)}
-                >
-                  <i className="mdi mdi-wallet font-size-17 align-middle me-1" />
-                  My Wallet
-                </Link>
+                {adminRole !== "super_admin" ? (
+                  <Link
+                    className="dropdown-item"
+                    href="/admin/my-wallet"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                  >
+                    <i className="mdi mdi-wallet font-size-17 align-middle me-1" />
+                    My Wallet
+                  </Link>
+                ) : null}
                 <div className="dropdown-divider" />
                 <button
                   type="button"
@@ -361,7 +501,14 @@ export function AdminShell({
                       className="waves-effect"
                     >
                       <i className="mdi mdi-wallet-plus-outline" />
-                      <span>Wallet Requests</span>
+                      <span>
+                        Wallet Requests
+                        {pendingWorkflowCount > 0 ? (
+                          <span className="badge bg-danger ms-2">
+                            {pendingWorkflowCount}
+                          </span>
+                        ) : null}
+                      </span>
                     </Link>
                   </li>
                 </>
