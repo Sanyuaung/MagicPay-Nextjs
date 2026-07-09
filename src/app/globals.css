@@ -868,9 +868,33 @@ canvas {
   }
 }
 
+.content {
+  margin-top: 84px;
+  margin-bottom: 92px;
+  padding-top: clamp(10px, 4vh, 50px);
+}
+
+.bottom-menu a.is-active i,
+.bottom-menu a.is-active p {
+  color: #02aa9e !important;
+}
+
 @media (max-width: 767.98px) {
   .header-menu {
-    padding-top: 2px;
+    padding-top: 0;
+  }
+
+  .header-menu .mobile-header-row {
+    min-height: 78px;
+  }
+
+  .header-menu .header-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-top: 0;
   }
 
   .header-menu .logo-admin {
@@ -881,13 +905,17 @@ canvas {
     max-width: 150px;
   }
 
+  .header-menu .mobile-header-brand {
+    min-height: 70px;
+  }
+
   .header-menu img {
-    margin-top: 8px;
+    margin-top: 0;
     height: 24px !important;
   }
 
   .header-menu h3 {
-    margin: 4px 0 8px;
+    margin: 2px 0 0;
     font-size: 15px;
     line-height: 1.15;
     max-width: 140px;
@@ -897,18 +925,13 @@ canvas {
   }
 
   .header-menu i {
-    margin-top: 10px;
+    margin-top: 0;
     font-size: 22px;
   }
 
   .header-menu .noti-icon .badge {
-    top: 6px;
-    right: -6px;
-  }
-
-  .content {
-    margin-top: 82px;
-    margin-bottom: 92px;
+    top: 4px;
+    right: -4px;
   }
 
   .bottom-menu i {
@@ -1312,6 +1335,21 @@ canvas {
   border-color: #97dccf;
   color: #0e5f55;
   font-weight: 700;
+}
+
+#sidebar-menu ul li.mm-active > a,
+body[data-sidebar="dark"] #sidebar-menu ul li.mm-active > a {
+  color: #02aa9e !important;
+  background-color: rgba(2, 170, 158, 0.14) !important;
+  border-left: 3px solid #02aa9e;
+}
+
+#sidebar-menu ul li.mm-active > a i,
+#sidebar-menu ul li.mm-active > a span,
+body[data-sidebar="dark"] #sidebar-menu ul li.mm-active > a i,
+body[data-sidebar="dark"] #sidebar-menu ul li.mm-active > a span {
+  color: #02aa9e !important;
+  font-weight: 600;
 }
 
 @media (max-width: 991.98px) {

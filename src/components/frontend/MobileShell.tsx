@@ -56,15 +56,34 @@ export function MobileShell({
     setIsNavigating(false);
   }, [pathname]);
 
+  const isTabActive = (tab: "home" | "wallet" | "transactions" | "profile") => {
+    if (tab === "home") {
+      return pathname === "/";
+    }
+    if (tab === "wallet") {
+      return pathname === "/wallet";
+    }
+    if (tab === "transactions") {
+      return (
+        pathname === "/transactions" || pathname.startsWith("/transaction/")
+      );
+    }
+    return pathname === "/profile";
+  };
+
   return (
     <div id="app" className="container-fluid">
       <div className="header-menu">
         <div className="row justify-content-center">
-          <div className="col-md-8">
-            <div className="row">
+          <div className="col-12">
+            <div className="row mobile-header-row align-items-center">
               <div className="col-3 text-center">
                 {backHref ? (
-                  <Link href={backHref} onClick={() => onNavigate(backHref)}>
+                  <Link
+                    href={backHref}
+                    className="header-icon-link"
+                    onClick={() => onNavigate(backHref)}
+                  >
                     <i className="mdi mdi-keyboard-backspace" />
                   </Link>
                 ) : null}
@@ -72,7 +91,7 @@ export function MobileShell({
               <div className="col-6 text-center">
                 <Link
                   href="/"
-                  className="logo-admin"
+                  className="logo-admin mobile-header-brand"
                   onClick={() => onNavigate("/")}
                 >
                   <img
@@ -151,7 +170,7 @@ export function MobileShell({
                 ) : (
                   <Link
                     href="/notifications"
-                    className="logo-admin btn header-item noti-icon waves-effect"
+                    className="logo-admin btn header-item noti-icon waves-effect header-icon-link header-noti-link"
                     onClick={() => onNavigate("/notifications")}
                   >
                     <i className="mdi mdi-bell-ring" />
@@ -170,7 +189,7 @@ export function MobileShell({
 
       <div className="content">
         <div className="row justify-content-center">
-          <div className="col-md-8">{children}</div>
+          <div className="col-12">{children}</div>
         </div>
       </div>
 
@@ -185,16 +204,24 @@ export function MobileShell({
           </div>
         </Link>
         <div className="row justify-content-center">
-          <div className="col-md-8">
+          <div className="col-12">
             <div className="row">
               <div className="col-3 text-center">
-                <Link href="/" onClick={() => onNavigate("/")}>
+                <Link
+                  href="/"
+                  className={isTabActive("home") ? "is-active" : ""}
+                  onClick={() => onNavigate("/")}
+                >
                   <i className="mdi mdi-home" />
                   <p>Home</p>
                 </Link>
               </div>
               <div className="col-3 text-center">
-                <Link href="/wallet" onClick={() => onNavigate("/wallet")}>
+                <Link
+                  href="/wallet"
+                  className={isTabActive("wallet") ? "is-active" : ""}
+                  onClick={() => onNavigate("/wallet")}
+                >
                   <i className="mdi mdi-wallet" />
                   <p>Wallet</p>
                 </Link>
@@ -202,6 +229,7 @@ export function MobileShell({
               <div className="col-3 text-center">
                 <Link
                   href="/transactions"
+                  className={isTabActive("transactions") ? "is-active" : ""}
                   onClick={() => onNavigate("/transactions")}
                 >
                   <i className="mdi mdi-repeat" />
@@ -209,7 +237,11 @@ export function MobileShell({
                 </Link>
               </div>
               <div className="col-3 text-center">
-                <Link href="/profile" onClick={() => onNavigate("/profile")}>
+                <Link
+                  href="/profile"
+                  className={isTabActive("profile") ? "is-active" : ""}
+                  onClick={() => onNavigate("/profile")}
+                >
                   <i className="mdi mdi-account" />
                   <p>Profile</p>
                 </Link>

@@ -33,9 +33,9 @@ export default function Page() {
       backHref="/"
       notifications={profile?.unReadNotifications || 0}
     >
-      <div className="account-pages">
-        <div className="row justify-content-center">
-          <div className="col-md-8 col-lg-6 col-xl-6">
+      <div className="profile-page">
+        <div className="row">
+          <div className="col-12">
             <div className="user-sidebar">
               <div className="card bg-theme text-white">
                 <div className="card-body">
@@ -55,42 +55,40 @@ export default function Page() {
                   </div>
                 </div>
               </div>
-              <div className="col-12">
-                <div className="card mb-3 bg-theme text-white">
-                  <div className="card-body pr-0">
-                    <Link
-                      href="/update-password"
-                      className="d-flex justify-content-between align-content-center"
-                    >
-                      <span>Change Password</span>
-                      <span className="mr-2">
-                        <i className="fa fa-angle-right" />
-                      </span>
-                    </Link>
-                    <hr />
-                    <Link
-                      href="/pin"
-                      className="d-flex justify-content-between align-content-center"
-                    >
-                      <span>
-                        {profile?.wallet_account ? "Change PIN" : "Set PIN"}
-                      </span>
-                      <span className="mr-2">
-                        <i className="fa fa-angle-right" />
-                      </span>
-                    </Link>
-                    <hr />
-                    <button
-                      type="button"
-                      onClick={onLogout}
-                      className="d-flex justify-content-between align-content-center dropdown-item profile-logout-btn"
-                    >
-                      Logout{" "}
-                      <span className="mr-2">
-                        <i className="mdi mdi-logout" />
-                      </span>
-                    </button>
-                  </div>
+              <div className="card mb-3 bg-theme text-white">
+                <div className="card-body pr-0">
+                  <Link
+                    href="/update-password"
+                    className="d-flex justify-content-between align-content-center"
+                  >
+                    <span>Change Password</span>
+                    <span className="mr-2">
+                      <i className="fa fa-angle-right" />
+                    </span>
+                  </Link>
+                  <hr />
+                  <Link
+                    href="/pin"
+                    className="d-flex justify-content-between align-content-center"
+                  >
+                    <span>
+                      {profile?.wallet_account ? "Change PIN" : "Set PIN"}
+                    </span>
+                    <span className="mr-2">
+                      <i className="fa fa-angle-right" />
+                    </span>
+                  </Link>
+                  <hr />
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="d-flex justify-content-between align-content-center dropdown-item profile-logout-btn"
+                  >
+                    Logout{" "}
+                    <span className="mr-2">
+                      <i className="mdi mdi-logout" />
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>
