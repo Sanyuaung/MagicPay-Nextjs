@@ -1337,6 +1337,435 @@ canvas {
   font-weight: 700;
 }
 
+.admin-dashboard-session-card {
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: 0 8px 18px rgba(47, 76, 112, 0.08);
+}
+
+.admin-dashboard-session-surface {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid var(--greeting-surface-border, #c5d4e4);
+  background: var(
+    --greeting-surface-bg,
+    linear-gradient(180deg, #e9f3f7 0%, #e3f0f5 100%)
+  );
+}
+
+.admin-dashboard-session-surface::after {
+  content: "";
+  position: absolute;
+  top: -44px;
+  right: -24px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--greeting-surface-bubble, rgba(59, 130, 246, 0.12));
+  pointer-events: none;
+}
+
+.admin-dashboard-session-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-dashboard-session-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-dashboard-weather-mark {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f738c;
+  background: rgba(255, 255, 255, 0.64);
+  border: 1px solid #d3dfeb;
+}
+
+.admin-dashboard-weather-mark i {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.admin-dashboard-weather-icon-float {
+  animation: dashboard-weather-float 2.8s ease-in-out infinite;
+}
+
+@keyframes dashboard-weather-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.admin-dashboard-session-title {
+  color: #1f2c42;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.admin-dashboard-session-text {
+  color: #627993;
+  font-size: 11px;
+}
+
+.admin-dashboard-session-text-animated {
+  animation: dashboard-message-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transform-origin: left center;
+}
+
+@keyframes dashboard-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(0.6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-dashboard-session-text-animated {
+    animation: none;
+  }
+
+  .admin-dashboard-weather-icon-float {
+    animation: none;
+  }
+}
+
+.admin-dashboard-session-side {
+  min-width: 160px;
+  text-align: right;
+  padding: 6px 10px 6px 14px;
+  border-left: 1px solid var(--greeting-surface-border, #d0e0ed);
+}
+
+.admin-dashboard-session-time {
+  color: #3a7cf3;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.admin-dashboard-session-date {
+  color: #8ea0b4;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.admin-dashboard-session-weather {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #6f8196;
+  font-size: 13px;
+}
+
+.admin-dashboard-session-weather i {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.admin-dashboard-session-weather strong {
+  color: #5f7288;
+  font-weight: 700;
+}
+
+.admin-dashboard-analysis-card {
+  border: 1px solid #d6e1ee;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(47, 76, 112, 0.06);
+}
+
+.admin-dashboard-analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid #ebf1f7;
+  padding-bottom: 10px;
+}
+
+.admin-dashboard-analysis-header h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #253448;
+}
+
+.admin-dashboard-analysis-item {
+  border: 1px solid #e0e8f2;
+  border-radius: 10px;
+  background: #f9fcff;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 88px;
+}
+
+.admin-dashboard-analysis-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.admin-dashboard-analysis-link .admin-dashboard-analysis-item {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.admin-dashboard-analysis-link:hover .admin-dashboard-analysis-item,
+.admin-dashboard-analysis-link:focus-visible .admin-dashboard-analysis-item {
+  transform: translateY(-1px);
+  border-color: #bfd5ee;
+  background: #f3f9ff;
+  box-shadow: 0 6px 14px rgba(37, 89, 153, 0.12);
+}
+
+.admin-dashboard-analysis-icon {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #e8f1fc;
+  color: #3b82f6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-dashboard-analysis-icon i {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.admin-dashboard-analysis-content {
+  min-width: 0;
+}
+
+.admin-dashboard-analysis-label {
+  font-size: 11px;
+  line-height: 1.25;
+  color: #6d8097;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-dashboard-analysis-value {
+  margin-top: 2px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #253448;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-dashboard-trend-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.admin-dashboard-trend-up {
+  color: #0f766e;
+  background: #d1fae5;
+}
+
+.admin-dashboard-trend-down {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.admin-dashboard-trend-same {
+  color: #475569;
+  background: #e2e8f0;
+}
+
+.admin-dashboard-analysis-content small {
+  display: block;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-dashboard-chart-card {
+  border: 1px solid #e0e8f2;
+  border-radius: 10px;
+  background: #fbfdff;
+  padding: 10px;
+}
+
+.admin-dashboard-range-filter {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.admin-dashboard-range-btn {
+  border: 1px solid #d4e2f1;
+  background: #ffffff;
+  color: #4d647e;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.admin-dashboard-range-btn.is-active {
+  border-color: #3b82f6;
+  background: #eaf2ff;
+  color: #1d4ed8;
+}
+
+.admin-dashboard-range-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-dashboard-chart-card h6 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #304258;
+}
+
+.admin-dashboard-chart-body {
+  height: 240px;
+}
+
+.admin-dashboard-chart-body-sm {
+  height: 210px;
+}
+
+@media (max-width: 1199.98px) {
+  .admin-dashboard-session-title {
+    font-size: 15px;
+  }
+
+  .admin-dashboard-session-text {
+    font-size: 11px;
+  }
+
+  .admin-dashboard-session-time {
+    font-size: 22px;
+  }
+
+  .admin-dashboard-session-date,
+  .admin-dashboard-session-weather {
+    font-size: 12px;
+  }
+
+  .admin-dashboard-analysis-value {
+    font-size: 16px;
+  }
+
+  .admin-dashboard-chart-body {
+    height: 220px;
+  }
+
+  .admin-dashboard-chart-body-sm {
+    height: 200px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .admin-dashboard-session-layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-dashboard-session-main {
+    align-items: flex-start;
+  }
+
+  .admin-dashboard-weather-mark {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+  }
+
+  .admin-dashboard-weather-mark i {
+    font-size: 24px;
+  }
+
+  .admin-dashboard-session-title {
+    font-size: 17px;
+  }
+
+  .admin-dashboard-session-text {
+    font-size: 13px;
+  }
+
+  .admin-dashboard-session-side {
+    min-width: 0;
+    border-left: 0;
+    border-top: 1px solid var(--greeting-surface-border, #d0e0ed);
+    padding: 10px 0 0;
+    text-align: left;
+  }
+
+  .admin-dashboard-session-time {
+    font-size: 24px;
+  }
+
+  .admin-dashboard-session-date,
+  .admin-dashboard-session-weather {
+    font-size: 13px;
+  }
+
+  .admin-dashboard-analysis-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-dashboard-analysis-item {
+    min-height: 84px;
+  }
+
+  .admin-dashboard-chart-body,
+  .admin-dashboard-chart-body-sm {
+    height: 200px;
+  }
+}
+
 #sidebar-menu ul li.mm-active > a,
 body[data-sidebar="dark"] #sidebar-menu ul li.mm-active > a {
   color: #02aa9e !important;

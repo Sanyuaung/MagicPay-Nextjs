@@ -47,6 +47,7 @@ export function AdminShell({
   breadcrumbCurrent,
   breadcrumbSingle,
   titleIconClass,
+  showContentBeforeTitle,
 }: {
   title: string;
   children: ReactNode;
@@ -56,6 +57,7 @@ export function AdminShell({
   breadcrumbCurrent?: string;
   breadcrumbSingle?: boolean;
   titleIconClass?: string;
+  showContentBeforeTitle?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -335,6 +337,12 @@ export function AdminShell({
               <li className="menu-title">Main</li>
               {adminRole === "super_admin" ? (
                 <>
+                  <li className={isActive("/admin") ? "mm-active" : ""}>
+                    <Link href="/admin" className="waves-effect">
+                      <i className="ti-home" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </li>
                   <li
                     className={isActive("/admin/admin-user") ? "mm-active" : ""}
                   >
@@ -432,6 +440,9 @@ export function AdminShell({
                 </button>
               </div>
             ) : null}
+            {showContentBeforeTitle ? (
+              <div className="row">{children}</div>
+            ) : null}
             <div className="page-title-box">
               <div className="row align-items-center admin-page-title-row">
                 <div className="col-md-8 admin-page-title-col">
@@ -484,7 +495,9 @@ export function AdminShell({
                 </div>
               </div>
             </div>
-            <div className="row">{children}</div>
+            {showContentBeforeTitle ? null : (
+              <div className="row">{children}</div>
+            )}
           </div>
         </div>
       </div>
