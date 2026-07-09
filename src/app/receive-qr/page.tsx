@@ -17,7 +17,7 @@ export default function Page() {
   const [showSetAmountModal, setShowSetAmountModal] = useState(false);
   const qrSectionRef = useRef<HTMLDivElement | null>(null);
   const downloadQrRef = useRef<HTMLDivElement | null>(null);
-  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Laravel";
+  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App";
 
   const maskedPhone = (phone?: string) => {
     if (!phone) return "";

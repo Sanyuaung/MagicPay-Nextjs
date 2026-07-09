@@ -66,7 +66,7 @@ export function AdminShell({
   const [toastType, setToastType] = useState<"success" | "error">("success");
   const [adminRole, setAdminRole] = useState<string>("");
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
-  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || "Magic Pay";
+  const appName = process.env.NEXT_PUBLIC_APP_NAME?.trim() || "App";
 
   useEffect(() => {
     document.body.setAttribute("data-sidebar", "dark");

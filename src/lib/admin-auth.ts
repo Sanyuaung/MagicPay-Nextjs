@@ -22,7 +22,7 @@ export async function checkAdminPassword(
 export function createAdminToken(adminId: bigint): string {
   return jwt.sign({ sub: adminId.toString(), role: "admin" }, JWT_SECRET, {
     expiresIn: "30d",
-    issuer: process.env.APP_NAME || "MagicPay",
+    issuer: process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || "App",
   });
 }
 

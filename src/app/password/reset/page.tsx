@@ -13,7 +13,7 @@ export default function PasswordResetRequestPage() {
   );
   const [resetUrl, setResetUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Laravel";
+  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App";
   const year = new Date().getFullYear();
 
   const submit = async (e: React.FormEvent) => {

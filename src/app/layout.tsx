@@ -3,9 +3,11 @@ import "./globals.css";
 import { PageTitleSync } from "@/components/PageTitleSync";
 import { GlobalRequestLoader } from "@/components/GlobalRequestLoader";
 
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || "App";
+
 export const metadata: Metadata = {
-  title: "Magic Pay",
-  description: "Magic Pay Next.js migration",
+  title: APP_NAME,
+  description: `${APP_NAME} Next.js migration`,
 };
 
 export default function RootLayout({

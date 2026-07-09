@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Magic Pay";
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "App";
 
 function cleanTitle(raw: string | null | undefined): string {
   if (!raw) return "";

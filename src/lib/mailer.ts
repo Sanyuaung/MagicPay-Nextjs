@@ -10,7 +10,10 @@ const MAIL_FROM_ADDRESS =
   process.env.MAIL_USERNAME ||
   "noreply@localhost";
 const MAIL_FROM_NAME =
-  process.env.MAIL_FROM_NAME || process.env.APP_NAME || "MagicPay";
+  process.env.MAIL_FROM_NAME ||
+  process.env.NEXT_PUBLIC_APP_NAME ||
+  process.env.APP_NAME ||
+  "App";
 
 let transporter: nodemailer.Transporter | null = null;
 
@@ -43,7 +46,8 @@ export async function sendPasswordResetEmail(
   requestedEmail: string,
 ) {
   const resolvedToEmail = process.env.MAIL_TO_ADDRESS || toEmail;
-  const appName = process.env.APP_NAME || "MagicPay";
+  const appName =
+    process.env.NEXT_PUBLIC_APP_NAME || process.env.APP_NAME || "App";
 
   const mailer = getTransporter();
   await mailer.sendMail({

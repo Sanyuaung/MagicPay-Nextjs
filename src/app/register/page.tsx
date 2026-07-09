@@ -18,7 +18,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
-  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "Laravel";
+  const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App";
   const year = new Date().getFullYear();
   const getPasswordStrength = (value: string) => {
     if (!value) {
