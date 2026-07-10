@@ -146,8 +146,8 @@ Copy `.env.example` to `.env` and configure at least:
 5. (Optional) Seed data:
 
    ```bash
-   npm run seed:admin
    npm run seed:laravel
+   npm run seed:admin
    ```
 
 6. Start development server:
@@ -158,6 +158,33 @@ Copy `.env.example` to `.env` and configure at least:
 
 7. Open app:
    - http://localhost:3000
+
+## Sample Login Accounts
+
+Use these test accounts after running seed scripts:
+
+| Account Type | Login Page     | Username                      | Password   | Seed Source            |
+| ------------ | -------------- | ----------------------------- | ---------- | ---------------------- |
+| Normal User  | `/login`       | Phone: `09788677455`          | `password` | `npm run seed:laravel` |
+| Admin User   | `/admin/login` | Email: `admin@gmail.com`      | `password` | `npm run seed:laravel` |
+| Super Admin  | `/admin/login` | Email: `admin@magicpay.local` | `Admin123` | `npm run seed:admin`   |
+
+Important:
+
+- Normal user login uses phone + password.
+- Admin/super admin login uses email + password.
+- If you run both seeders, run `npm run seed:laravel` first and `npm run seed:admin` after it so the super admin account is available.
+
+### Related Pages
+
+| Page            | URL               | Notes                                                    |
+| --------------- | ----------------- | -------------------------------------------------------- |
+| User Login      | `/login`          | Use normal user account (phone + password)               |
+| Admin Login     | `/admin/login`    | Use admin or super admin account (email + password)      |
+| User Register   | `/register`       | Create a new normal user account                         |
+| Forgot Password | `/password/reset` | Request password reset flow                              |
+| User Dashboard  | `/wallet`         | Redirect target after successful normal user login       |
+| Admin Dashboard | `/admin`          | Redirect target after successful admin/super admin login |
 
 ## NPM Scripts
 

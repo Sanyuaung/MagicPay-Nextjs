@@ -31,7 +31,7 @@ export default function LoginPage() {
         remember,
       });
       if (res.data?.token) {
-        setToken(res.data.token);
+        setToken(res.data.token, remember);
       }
       router.push("/");
     } catch (err) {
@@ -130,6 +130,13 @@ export default function LoginPage() {
                         </button>
                       </div>
                     </div>
+                    {remember ? (
+                      <div className="mb-3">
+                        <small className="d-block text-white-50">
+                          Keep me signed in on this device for up to 30 days.
+                        </small>
+                      </div>
+                    ) : null}
 
                     <div className="mt-2 mb-0 row">
                       <div className="col-12 mt-4">
@@ -142,6 +149,29 @@ export default function LoginPage() {
                       </div>
                     </div>
                   </form>
+
+                  <div className="mt-3 text-center">
+                    <button
+                      type="button"
+                      className="btn btn-link p-0 text-info"
+                      onClick={() => {
+                        setPhone("09788677455");
+                        setPassword("password");
+                      }}
+                    >
+                      <i className="mdi mdi-account-key me-1" />
+                      Use sample user login
+                    </button>
+                    <div className="mt-2">
+                      <Link
+                        href="/admin/login"
+                        className="btn btn-link p-0 text-success fw-medium"
+                      >
+                        <i className="mdi mdi-shield-account me-1" />
+                        Go to admin login
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

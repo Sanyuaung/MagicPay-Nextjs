@@ -8,6 +8,7 @@ import { errorResponse, successResponse } from "@/lib/response";
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+  remember: z.boolean().optional().default(false),
 });
 
 export async function POST(req: Request) {
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 30,
+      ...(payload.remember ? { maxAge: 60 * 60 * 24 * 30 } : {}),
       path: "/",
     });
     return response;
