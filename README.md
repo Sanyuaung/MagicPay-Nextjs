@@ -202,11 +202,6 @@ docs/
   laravel-parity-audit-2026-07-03.md
 ```
 
-## Laravel Parity Notes
-
-- Current parity audit status is PASS for core user/admin/API/database areas.
-- See detailed report in `docs/laravel-parity-audit-2026-07-03.md`.
-
 ## Deployment Checklist
 
 1. Set production `.env` values securely.
